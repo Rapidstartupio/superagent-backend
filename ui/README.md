@@ -3,7 +3,7 @@
 # Superagent 🥷
 
 **Build, deploy, and manage LLM-powered agents**
-[Superagent.sh](https://Superagent.sh)
+[rapidagent.ai](https://rapidagent.ai)
 
 <p>
 <img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/homanp/Superagent" />
@@ -25,11 +25,11 @@ Superagent provides a GUI which makes it easy for anyone to manage agents, docum
 
 ## 🥷 Superagent Cloud
 
-If you are looking for a plug-n-play way getting started be sure to checkout [Superagent.sh](https://Superagent.sh).
+If you are looking for a plug-n-play way getting started be sure to checkout [rapidagent.ai](https://rapidagent.ai).
 
 ## 🔎 Documentation
 
-Checkout the [full documentation here](https://docs.Superagent.sh/).
+Checkout the [full documentation here](https://docs.rapidagent.ai/).
 
 ## 🚧 Roadmap
 

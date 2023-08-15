@@ -161,7 +161,7 @@ export default function ShareClientPage({ agent, token }) {
   };
 
   const handleCopyShareLink = () => {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://app.superagent.sh';
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://app.rapidagent.ai';
     
     navigator.clipboard.writeText(
       `${baseUrl}/share?agentId=${agent.id}&token=${token}`
@@ -187,7 +187,7 @@ export default function ShareClientPage({ agent, token }) {
         <HStack justifyContent="space-between">
           <HStack spacing={4}>
             <Text as="strong" color={fontColor} fontSize="lg">
-              Superagent
+              RapidAgent
             </Text>
             <Tag size="sm">{SUPERAGENT_VERSION}</Tag>
           </HStack>
@@ -226,14 +226,14 @@ export default function ShareClientPage({ agent, token }) {
                 {agent.name}
               </Text>
               <Text color="#777">
-                This agent was created using Superagent. It leverages the{" "}
+                This agent was created using RapidAgent. It leverages the{" "}
                 {agent?.llm?.model} large language model. Note that this agent was
                 marked as public by it's creator.
               </Text>
               <Text color="#777">
                 More info:{" "}
-                <Link color="orange.500" href="https://www.superagent.sh">
-                  superagent.sh
+                <Link color="orange.500" href="https://www.rapidagent.ai">
+                  rapidagent.ai
                 </Link>
               </Text>
             </Stack>

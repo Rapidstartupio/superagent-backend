@@ -4,7 +4,7 @@ import ApiTokensClientPage from "./client-page";
 import Api from "@/lib/api";
 
 export const metadata = {
-  title: "Api tokens | Superagent",
+  title: "Api tokens | RapidAgent",
   description: "Manage your api tokens",
 };
 

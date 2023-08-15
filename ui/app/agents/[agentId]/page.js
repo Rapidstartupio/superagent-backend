@@ -4,7 +4,7 @@ import AgentDetailClientPage from "./client-page";
 import API from "@/lib/api";
 
 export const metadata = {
-  title: "Agent | Superagent",
+  title: "Agent | RapidAgent",
   description: "Run your agent",
 };
 

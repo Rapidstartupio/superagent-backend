@@ -1,7 +1,7 @@
 import HomeClientPage from "./client-page";
 
 export const metadata = {
-  title: "Home | Superagent",
+  title: "Home | RapidAgent",
   description: "Build, deploy and manage AI Agents in seconds",
 };
 

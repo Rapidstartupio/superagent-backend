@@ -95,7 +95,7 @@ class AgentTool:
 
     def run(self, *args) -> str:
         superagent = Superagent(
-            environment="https://api.superagent.sh", api_key=self.api_key
+            environment="https://api.rapidagent.ai", api_key=self.api_key
         )
         agent_id = self.metadata["agentId"]
         output = superagent.agent.prompt_agent(

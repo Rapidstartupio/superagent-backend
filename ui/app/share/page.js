@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import crypto from "crypto";
 
 export const metadata = {
-  title: "Superagent",
+  title: "RapidAgent",
   description: "Create AI Agents in seconds",
 };
 

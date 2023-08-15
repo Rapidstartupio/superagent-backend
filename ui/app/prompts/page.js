@@ -4,7 +4,7 @@ import PromptsClientPage from "./client-page";
 import Api from "@/lib/api";
 
 export const metadata = {
-  title: "Prompts | Superagent",
+  title: "Prompts | RapidAgent",
   description: "Manage your prompts",
 };
 

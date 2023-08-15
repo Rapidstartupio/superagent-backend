@@ -4,7 +4,7 @@ import DocumentsClientPage from "./client-page";
 import Api from "@/lib/api";
 
 export const metadata = {
-  title: "Documents | SuperAgent",
+  title: "Documents | RapidAgent",
   description: "Manage your documents",
 };
 

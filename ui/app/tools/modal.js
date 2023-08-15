@@ -126,7 +126,7 @@ export default function ToolsModal({ onSubmit, onClose, isOpen, tool }) {
                 <FormLabel>Type</FormLabel>
                 <Select {...register("type", { required: true })}>
                   <option value="SEARCH">Websearch</option>
-                  <option value="AGENT">Superagent</option>
+                  <option value="AGENT">RapidAgent</option>
                   <option value="WOLFRAM_ALPHA">Wolfram Alpha</option>
                   <option value="REPLICATE">Replicate</option>
                   <option value="ZAPIER_NLA">Zapier</option>
@@ -185,7 +185,7 @@ export default function ToolsModal({ onSubmit, onClose, isOpen, tool }) {
               )}
               {type === "AGENT" && (
                 <FormControl isRequired>
-                  <FormLabel>Select a Superagent</FormLabel>
+                  <FormLabel>Select a RapidAgent</FormLabel>
                   {isLoadingAgents ? (
                     <Center>
                       <Spinner size="xs" />

@@ -8,7 +8,7 @@ import AppBody from "./_components/appbody";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Superagent",
+  title: "RapidAgent",
   description: "Build, deploy and manage AI Agents in seconds",
   openGraph: {
     images: ["/og-image.png"],

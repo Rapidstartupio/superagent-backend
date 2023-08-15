@@ -4,7 +4,7 @@ import TagsClientPage from "./client-page";
 import Api from "@/lib/api";
 
 export const metadata = {
-  title: "Tags | Superagent",
+  title: "Tags | RapidAgent",
   description: "Manage your tags",
 };
 

@@ -29,24 +29,24 @@ export default function HomeClientPage() {
           borderWidth="1px"
           borderRadius="md"
         >
-          Superagent is in public beta, expect rapid updates. All feedback
+          RapidAgent is in public beta, expect rapid updates. All feedback
           appreciated.
         </Alert>
         <Stack>
           <HStack>
             <Heading as="h1" fontSize="2xl">
-              Superagent
+              RapidAgent
             </Heading>
             <Tag size="sm">Beta</Tag>
           </HStack>
           <Text>
-            Superagent is a platform that enables you to create, manage and run
+            RapidAgent is a platform that enables you to create, manage and run
             AI Agents in seconds. We are currently in open beta so bare with us.
             Make sure the read the documentation on how to integrate Superagent
             with your app.
           </Text>
         </Stack>
-        <NextLink passHref href="https://docs.superagent.sh">
+        <NextLink passHref href="https://docs.rapidagent.ai">
           <Stack
             minHeight="200px"
             bgGradient={useColorModeValue(

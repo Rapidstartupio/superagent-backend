@@ -1,6 +1,6 @@
 ---
 title: Concepts
-description: "These are the core concepts that Superagent uses to create LLM Agents. It contains practical examples as well as links to papers or sources."
+description: "These are the core concepts that RapidAgent uses to create LLM Agents. It contains practical examples as well as links to papers or sources."
 ---
 
 ### Agents
@@ -20,14 +20,14 @@ An agent can be invoked with `memory` as well as a `document` which gives the Ag
 
 ### Documents
 
-Superagent allows users to do question answering over documents by attaching a `Document` to an `Agent`.
-Documents are files, such as PDF, TXT, images, Markdown etc. that can be ingested by passing a publicly available `URL` to the Superagent [API](/api-reference/authentication).
-Superagent splits these documents into smaller chunks and stores them in a vector database for use downstream.
+RapidAgent allows users to do question answering over documents by attaching a `Document` to an `Agent`.
+Documents are files, such as PDF, TXT, images, Markdown etc. that can be ingested by passing a publicly available `URL` to the RapidAgent [API](/api-reference/authentication).
+RapidAgent splits these documents into smaller chunks and stores them in a vector database for use downstream.
 
 This approach has some downsides when working with tabular data. We are looking into how to best approach this problem.
 
 ### Prompts
 
-Superagent allows users to configure their `Agents` using prompts.
+RapidAgent allows users to configure their `Agents` using prompts.
 A prompt is piece of text that gives context to the LLM. It can contain instructions on how the Agent should act, input variables used for injecting data into the prompt.
 Common examples of input_variables are `human_input`, `question` and `chat_history` for in context memory.

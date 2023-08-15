@@ -62,7 +62,7 @@ export default function AppBody({ children, session }) {
           <SidebarSection direction="row">
           <HStack width="full" justifyContent="space-between" paddingX="2">
             <Text as="strong" fontSize="2xl">
-              Superagent
+              RapidAgent
             </Text>
             <Spacer />
             <Tag size="sm">{SUPERAGENT_VERSION}</Tag>

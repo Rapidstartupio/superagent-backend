@@ -59,7 +59,7 @@ export default function AgentNavbar({ agent, apiToken, hasApiTokenWarning }) {
   );
 
   const copyToClipboard = () => {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://app.superagent.sh';
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://app.rapidagent.ai';
 
     navigator.clipboard.writeText(
       `${baseUrl}/share?agentId=${agent.id}&token=${encrypt(

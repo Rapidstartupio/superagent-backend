@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  title: Superagent
+  title: RapidAgent
   description: Build, deploy, and manage LLM-powered agents
   version: 0.0.40
 paths:
