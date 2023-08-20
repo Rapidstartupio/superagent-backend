@@ -493,7 +493,7 @@ export default function ShareClientPage({ agent, token }) {
             target="_blank"
             color={useColorModeValue("black", "white")}
           >
-            superagent.sh
+            rapidagent.ai
           </Link>
         </Text>
       </Stack>

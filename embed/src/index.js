@@ -5,7 +5,7 @@ import {SuperAgentClient} from 'superagentai-js';
 import { ChakraProvider, Box, useDisclosure, Avatar, IconButton, Icon } from '@chakra-ui/react';
 import {TbX} from "react-icons/tb"
 
-const ENVIRONMENT = "https://api.superagent.sh"
+const ENVIRONMENT = "https://api.rapidagent.ai"
 
 const styles = {
   container: {
@@ -76,7 +76,7 @@ function SuperagentWidget({ agentId, apiKey, type }) {
             style={styles.iframe} 
             width="100%"
             height="100%"
-            src={`https://app.superagent.sh/share?agentId=${agentId}&token=${agent.data.shareableToken}`} 
+            src={`https://app.rapidagent.ai/share?agentId=${agentId}&token=${agent.data.shareableToken}`} 
           />
         )}
       </div>
@@ -91,7 +91,7 @@ function SuperagentWidget({ agentId, apiKey, type }) {
             boxShadow="md"
             width="55px"
             height="55px"
-            src={agent?.data?.avatarUrl || "https://app.superagent.sh/logo.png"}
+            src={agent?.data?.avatarUrl || "https://app.rapidagent.ai/logo.png"}
             _hover={{transform: "scale(1.1)", transition: "0.2s all"}} 
             position="fixed"
             cursor="pointer"
@@ -107,7 +107,7 @@ function SuperagentWidget({ agentId, apiKey, type }) {
             icon={<Icon as={TbX} fontSize="2xl" />}
             width="55px"
             height="55px"
-            src={agent?.data?.avatarUrl || "https://app.superagent.sh/logo.png"}
+            src={agent?.data?.avatarUrl || "https://app.rapidagent.ai/logo.png"}
             _hover={{transform: "scale(1.1)", transition: "0.2s all"}} 
             position="fixed"
             cursor="pointer"
@@ -122,7 +122,7 @@ function SuperagentWidget({ agentId, apiKey, type }) {
               style={styles.iframe} 
               width="100%"
               height="100%"
-              src={`https://app.superagent.sh/share?agentId=${agentId}&token=${agent.data.shareableToken}`} 
+              src={`https://app.rapidagent.ai/share?agentId=${agentId}&token=${agent.data.shareableToken}`} 
             />
           </Box>
         )}
