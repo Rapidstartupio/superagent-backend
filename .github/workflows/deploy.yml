@@ -84,7 +84,7 @@ jobs:
             echo "AZURE_API_VERSION=$AZURE_API_VERSION" >> .env
             # continue with your process
             docker-compose up -d --force-recreate --build
-            kill -KILL $(lsof -t -i:8002) || true
+            lsof -i :8002 | awk 'NR>1 {print $2}' | xargs kill -9
             python3.11 -m venv myenv
             source myenv/bin/activate
             pip install poetry
