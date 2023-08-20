@@ -1,10 +1,15 @@
 "use client";
 import {
-  Button,
   Box,
+  Button,
   Code,
+  Center,
   Container,
-  Circle,
+  Drawer,
+  DrawerBody,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
   HStack,
   Icon,
   IconButton,
@@ -12,37 +17,140 @@ import {
   InputGroup,
   InputRightElement,
   Link,
+  OrderedList,
   Stack,
   Text,
-  Tag,
   useColorModeValue,
   Avatar,
+  Divider,
+  UnorderedList,
+  useDisclosure,
   useToast,
+  Card,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
-import React, { useState } from "react";
-import { TbArrowRight, TbSend, TbCopy } from "react-icons/tb";
-import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import React, { useCallback, useState } from "react";
+import {
+  TbSend,
+  TbCopy,
+  TbAlignJustified,
+  TbMenu,
+  TbPlus,
+} from "react-icons/tb";
 import { useForm } from "react-hook-form";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { coldarkDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { BeatLoader } from "react-spinners";
-import { SUPERAGENT_VERSION } from "@/lib/constants";
-import { ReactMarkdown } from "react-markdown/lib/react-markdown";
+import { motion } from "framer-motion";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { MemoizedReactMarkdown } from "@/lib/markdown";
+import { useShareSession } from "@/lib/share-session";
+import { useAsync, useAsyncFn } from "react-use";
 
-function LoadingMessage() {
+dayjs.extend(relativeTime);
+
+function PulsatingCursor() {
+  return (
+    <motion.div
+      initial="start"
+      animate={{
+        scale: [1, 1.05, 1],
+        opacity: [0, 1, 0],
+      }}
+      transition={{
+        duration: 0.5,
+        repeat: Infinity,
+      }}
+    >
+      ▍
+    </motion.div>
+  );
+}
+
+function LoadingMessage({ name = "Bot" }) {
   return (
     <Container maxW="5xl">
-      <HStack spacing={4}>
-        <BeatLoader color="white" size={8} />
-        <Text color="#777">Thinking...</Text>
+      <HStack spacing={2}>
+        <BeatLoader color="white" size={5} />
+        <Text fontSize="md" color="gray.500">
+          <Text fontWeight="bold" as="span">
+            {name}
+          </Text>{" "}
+          is typing...
+        </Text>
       </HStack>
     </Container>
   );
 }
 
-function Message({ message, type }) {
+function Navbar({
+  sessions = [],
+  selectedSession,
+  onCreate = () => {},
+  onSelect = () => {},
+}) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  return (
+    <HStack paddingY={[4, 4]} position="absolute" top={0}>
+      <IconButton icon={<Icon as={TbMenu} />} onClick={onOpen} />
+      <Drawer
+        isOpen={isOpen}
+        placement="left"
+        onClose={onClose}
+        zIndex={999999}
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerBody>
+            {sessions.length === 0 && (
+              <Center flex={1}>
+                <Text color="gray.500" fontSize="md">
+                  No conversations found
+                </Text>
+              </Center>
+            )}
+            <Stack marginTop={10}>
+              {sessions?.map(({ id, created_at, name }) => (
+                <Card
+                  onClick={() => onSelect(id)}
+                  key={id}
+                  padding={4}
+                  cursor="pointer"
+                  borderWidth="1px"
+                  borderColor={
+                    selectedSession.id === id ? "orange.500" : "transparent"
+                  }
+                  _hover={{ borderWidth: "1px", borderColor: "orange.500" }}
+                >
+                  <HStack justifyContent="space-between">
+                    <Text noOfLines={1} fontSize="md">
+                      {name}
+                    </Text>
+                    <Text noOfLines={1} fontSize="md" color="gray.500">
+                      {dayjs(created_at).fromNow()}
+                    </Text>
+                  </HStack>
+                </Card>
+              ))}
+            </Stack>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+      <Button leftIcon={<Icon as={TbPlus} />} onClick={onCreate}>
+        New chat
+      </Button>
+    </HStack>
+  );
+}
+
+function Message({ agent, message, type }) {
+  const toast = useToast();
+
   return (
     <Container
       maxW="5xl"
@@ -52,27 +160,45 @@ function Message({ message, type }) {
     >
       <HStack alignItems="flex-start" spacing={4}>
         {type === "human" ? (
-          <Circle
-            width={4}
-            height={4}
-            backgroundColor="orange.500"
-            marginTop={1}
-          />
+          <Icon as={TbAlignJustified} color="gray.500" marginTop={1} />
         ) : (
-          <Avatar size="xs" src="/logo.png" />
+          <Avatar size="xs" src={agent.avatarUrl || "./logo.png"} />
         )}
         {type === "human" ? (
           <Text>{message}</Text>
         ) : (
-          <Box>
-            <ReactMarkdown
+          <Box maxWidth="95%">
+            {message.length === 0 && <PulsatingCursor />}
+            <MemoizedReactMarkdown
               components={{
+                a({ children, href }) {
+                  return (
+                    <Link href={href} color="orange.500" target="_blank">
+                      {children}
+                    </Link>
+                  );
+                },
+                ol({ children }) {
+                  return <OrderedList>{children}</OrderedList>;
+                },
+                ul({ children }) {
+                  return <UnorderedList>{children}</UnorderedList>;
+                },
+                p({ children }) {
+                  return <Text marginBottom={2}>{children}</Text>;
+                },
                 code({ node, inline, className, children, ...props }) {
                   const value = String(children).replace(/\n$/, "");
                   const match = /language-(\w+)/.exec(className || "");
 
                   const handleCopyCode = () => {
                     navigator.clipboard.writeText(value);
+
+                    toast({
+                      description: "Copied to clipboard",
+                      position: "top",
+                      colorScheme: "gray",
+                    });
                   };
 
                   return !inline ? (
@@ -86,13 +212,14 @@ function Message({ message, type }) {
                         />
                       </HStack>
                       <SyntaxHighlighter
+                        showLineNumbers
                         codeTagProps={{
                           style: {
                             lineHeight: "inherit",
                             fontSize: "13px",
                           },
                         }}
-                        style={dracula}
+                        style={coldarkDark}
                         language={(match && match[1]) || ""}
                       >
                         {value}
@@ -108,7 +235,7 @@ function Message({ message, type }) {
               remarkPlugins={[remarkGfm]}
             >
               {message}
-            </ReactMarkdown>
+            </MemoizedReactMarkdown>
           </Box>
         )}
       </HStack>
@@ -119,24 +246,44 @@ function Message({ message, type }) {
 export default function ShareClientPage({ agent, token }) {
   const toast = useToast();
   const [messages, setMessages] = useState([]);
-  const fontColor = useColorModeValue("white", "white");
-  const session = useSession();
+  const [selectedSession, setSelectedSession] = useState();
+  const { getSessions, updateSession, createSession } = useShareSession({
+    agent,
+  });
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     reset,
     formState: { isSubmitting },
   } = useForm();
+  const { value: shareSessions } = useAsync(async () => {
+    const sessions = await getSessions();
+    const sortedSessions = sessions.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+    const latestSession = sortedSessions[0];
+
+    setSelectedSession(latestSession);
+
+    return sortedSessions;
+  }, [agent, setSelectedSession]);
 
   const onSubmit = async (values) => {
     const { input } = values;
+    let message = "";
 
     setMessages((previousMessages) => [
       ...previousMessages,
       { type: "human", message: input },
     ]);
 
-    const response = await fetch(
+    setMessages((previousMessages) => [
+      ...previousMessages,
+      { type: "ai", message },
+    ]);
+
+    await fetchEventSource(
       `${process.env.NEXT_PUBLIC_SUPERAGENT_API_URL}/agents/${agent.id}/predict`,
       {
         method: "POST",
@@ -146,33 +293,67 @@ export default function ShareClientPage({ agent, token }) {
         },
         body: JSON.stringify({
           input: { input },
-          has_streaming: false,
+          has_streaming: true,
+          session: selectedSession.id,
         }),
+        async onmessage(event) {
+          if (event.data !== "[END]") {
+            message += event.data === "" ? `${event.data} \n` : event.data;
+            setMessages((previousMessages) => {
+              let updatedMessages = [...previousMessages];
+
+              for (let i = updatedMessages.length - 1; i >= 0; i--) {
+                if (updatedMessages[i].type === "ai") {
+                  updatedMessages[i].message = message;
+                  break;
+                }
+              }
+
+              return updatedMessages;
+            });
+          }
+        },
       }
     );
-    const output = await response.json();
 
-    setMessages((previousMessages) => [
-      ...previousMessages,
-      { type: "ai", message: output.data },
-    ]);
+    if (selectedSession.name === "New chat!") {
+      await updateSession(selectedSession.id, {
+        name: input,
+        updated_at: new Date(),
+      });
+
+      router.refresh();
+    }
 
     reset();
   };
 
-  const handleCopyShareLink = () => {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://app.rapidagent.ai';
-    
-    navigator.clipboard.writeText(
-      `${baseUrl}/share?agentId=${agent.id}&token=${token}`
-    );
+  const handleCreateSession = useCallback(async () => {
+    const session = await createSession();
 
     toast({
-      description: "Share link copied!",
+      description: "New chat created!",
       position: "top",
       colorScheme: "gray",
     });
-  };
+    setSelectedSession(session);
+    setMessages([]);
+    router.refresh();
+  }, [toast]);
+
+  const handleSelectSession = useCallback(
+    async (id) => {
+      const session = shareSessions.find(
+        ({ id: sessionId }) => sessionId === id
+      );
+
+      setSelectedSession(session);
+      setMessages([]);
+    },
+    [shareSessions]
+  );
+
+  console.log(agent.avatarUrl);
 
   return (
     <Stack
@@ -204,10 +385,8 @@ export default function ShareClientPage({ agent, token }) {
       )}
       <Stack
         flex={1}
-        bgGradient="linear(to-l, #333, #222)"
-        borderRadius="lg"
         justifyContent={messages.length > 0 ? "flex-start" : "center"}
-        paddingX={[2, 4]}
+        paddingX={4}
         paddingY={[2, 10]}
         position="relative"
         overflow="hidden"
@@ -219,10 +398,11 @@ export default function ShareClientPage({ agent, token }) {
             borderWidth="1px"
             borderRadius="md"
             padding={5}
-            zIndex={99999}
+            zIndex={1}
           >
             <Stack spacing={4}>
-              <Text color="white" fontWeight="bold" fontSize="lg">
+              <Avatar src={agent.avatarUrl || "./logo.png"} />
+              <Text fontWeight="bold" fontSize="lg">
                 {agent.name}
               </Text>
               <Text color="#777">
@@ -230,9 +410,9 @@ export default function ShareClientPage({ agent, token }) {
                 {agent?.llm?.model} large language model. Note that this agent was
                 marked as public by it's creator.
               </Text>
-              <Text color="#777">
+              <Text color="gray.500" fontSize="sm">
                 More info:{" "}
-                <Link color="orange.500" href="https://www.rapidagent.ai">
+                <Link color="orange.500" href="https://rapidagent.ai">
                   rapidagent.ai
                 </Link>
               </Text>
@@ -246,16 +426,16 @@ export default function ShareClientPage({ agent, token }) {
           right={0}
           bottom={0}
           overflow="auto"
-          paddingY={10}
+          paddingX={5}
+          paddingY={12}
         >
           {messages.map(({ type, message }, index) => (
-            <Message key={index} type={type} message={message} />
+            <Message key={index} agent={agent} type={type} message={message} />
           ))}
-          {isSubmitting && <LoadingMessage />}
         </Box>
         <Box
           position="absolute"
-          bgGradient="linear(to-t, #222, transparent)"
+          bgGradient="linear(to-t, #131416, transparent)"
           bottom={0}
           left={0}
           right={0}
@@ -263,40 +443,60 @@ export default function ShareClientPage({ agent, token }) {
         />
         <Box
           position="absolute"
-          bgGradient="linear(to-b, #222, transparent)"
+          bgGradient="linear(to-b, #131416, transparent)"
           top={0}
           left={0}
           right={0}
           height="50px"
         />
-      </Stack>
-
-      <InputGroup
-        size="lg"
-        maxWidth="5xl"
-        marginX="auto"
-        as="form"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <Input
-          variant="filled"
-          boxShadow="md"
-          backgroundColor="#333"
-          type="text"
-          placeholder="Enter an input..."
-          fontSize="md"
-          isDisabled={isSubmitting}
-          {...register("input", { required: true })}
+        <Navbar
+          sessions={shareSessions}
+          selectedSession={selectedSession}
+          onCreate={handleCreateSession}
+          onSelect={handleSelectSession}
         />
-        <InputRightElement>
-          <IconButton
-            isLoading={isSubmitting}
-            isDisabled={isSubmitting}
-            variant="ghost"
-            icon={<Icon as={TbSend} />}
+      </Stack>
+      <Stack paddingX={4} paddingBottom={4}>
+        {isSubmitting && <LoadingMessage name={agent.name} />}
+        <InputGroup
+          size="lg"
+          maxWidth="5xl"
+          marginX="auto"
+          as="form"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <Input
+            variant="filled"
+            autoFocus={false}
+            boxShadow="md"
+            backgroundColor="#333"
+            type="text"
+            placeholder="Enter an input..."
+            fontSize="md"
+            {...register("input", { required: true })}
           />
-        </InputRightElement>
-      </InputGroup>
+          <InputRightElement>
+            <IconButton
+              isLoading={isSubmitting}
+              isDisabled={isSubmitting}
+              variant="ghost"
+              type="submit"
+              icon={<Icon as={TbSend} />}
+            />
+          </InputRightElement>
+        </InputGroup>
+        <Text textAlign="center" fontSize="xs" color="gray.500">
+          Powered by{" "}
+          <Link
+            fontWeight="bold"
+            href="https://rapidagent.ai"
+            target="_blank"
+            color={useColorModeValue("black", "white")}
+          >
+            superagent.sh
+          </Link>
+        </Text>
+      </Stack>
     </Stack>
   );
 }

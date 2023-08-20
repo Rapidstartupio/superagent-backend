@@ -1,14 +1,14 @@
 import {
-  TbHome,
   TbKey,
   TbBook,
   TbLogout,
-  TbFileText,
+  TbDatabasePlus,
   TbBrain,
   TbCreditCard,
   TbCodePlus,
   TbTool,
   TbListSearch,
+  TbBolt,
   TbTag,
 } from "react-icons/tb";
 import { signOut } from "next-auth/react";
@@ -22,10 +22,10 @@ const createPortalUrl = async () => {
 
 export const MAIN_MENU = [
   {
-    id: "home",
-    label: "Home",
+    id: "library",
+    label: "Library",
     path: "/",
-    icon: TbHome,
+    icon: TbBolt,
   },
   {
     id: "agents",
@@ -40,16 +40,16 @@ export const MAIN_MENU = [
     icon: TbTool,
   },
   {
+    id: "datasources",
+    label: "Datasources",
+    path: "/datasources",
+    icon: TbDatabasePlus,
+  },
+  {
     id: "prompts",
     label: "Prompts",
     path: "/prompts",
     icon: TbCodePlus,
-  },
-  {
-    id: "documents",
-    label: "Documents",
-    path: "/documents",
-    icon: TbFileText,
   },
   {
     id: "logs",
@@ -72,13 +72,6 @@ export const MAIN_MENU = [
 ];
 
 export const FOOTER_MENU = [
-  {
-    id: "billing",
-    label: "Billing",
-    path: null,
-    onClick: () => createPortalUrl(),
-    icon: TbCreditCard,
-  },
   {
     id: "docs",
     label: "Documentation",

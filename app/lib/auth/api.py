@@ -20,3 +20,4 @@ async def get_api_key(
 
     except Exception as e:
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail=str(e))
+

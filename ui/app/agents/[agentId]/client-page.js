@@ -36,7 +36,7 @@ import { useAsyncFn } from "react-use";
 import { TOOL_ICONS } from "@/lib/constants";
 import API from "@/lib/api";
 import AgentNavbar from "./_components/nav";
-import DocumentPickerModal from "@/app/documents/document-picker";
+import DocumentPickerModal from "@/app/datasources/_components/document-picker";
 import ToolPickerModal from "@/app/tools/tool-picker";
 import TagPickerModal from "@/app/tags/tag-picker";
 import { getPromptVariables } from "@/lib/prompts";
@@ -431,7 +431,7 @@ export default function AgentDetailClientPage({
             ))}
           </HStack>
           <Divider />
-          <PanelHeading title="Documents" onCreate={onDocumentModalOpen} />
+          <PanelHeading title="Datasources" onCreate={onDocumentModalOpen} />
           <HStack paddingX={6} paddingY={6} flexWrap="wrap" gap={2} spacing={0}>
             {documents.map(({ id, document }) => (
               <AgentDocument
@@ -508,7 +508,7 @@ export default function AgentDetailClientPage({
           <Divider />
           <PanelHeading title="Tags" onCreate={onTagModalOpen} />
           <HStack paddingX={6} paddingY={6} flexWrap="wrap" gap={2} spacing={0}>
-            {agent.tags.map(({ id, name, color }) => (
+            {agent.tags?.map(({ id, name, color }) => (
               <AgentTag
                 key={id}
                 agent={agent}

@@ -27,6 +27,7 @@ from app.lib.models.tool import (
     ZapierToolInput,
     AgentToolInput,
     OpenApiToolInput,
+    MetaphorToolInput,
 )
 from app.lib.prisma import prisma
 from app.lib.prompts import (
@@ -35,6 +36,7 @@ from app.lib.prompts import (
     DEFAULT_AGENT_PROMPT,
 )
 from app.lib.tools import (
+    DocumentTool,
     ToolDescription,
     get_search_tool,
     get_wolfram_alpha_tool,
@@ -43,7 +45,7 @@ from app.lib.tools import (
     get_openapi_tool,
     get_chatgpt_plugin_tool,
     AgentTool,
-    DocSummarizerTool,
+    MetaphorTool,
 )
 from app.lib.vectorstores.base import VectorStoreBase
 
@@ -307,24 +309,20 @@ class AgentBase:
         if type == "CHATGPT_PLUGIN":
             # TODO: confirm metadata has (can have) url
             return (get_chatgpt_plugin_tool(metadata), type)
+        if type == "METAPHOR":
+            return (MetaphorTool(metadata=metadata), MetaphorToolInput)
 
     def _get_tools(self) -> list:
         tools = []
-        embeddings = OpenAIEmbeddings()
 
         for agent_document in self.documents:
-            description = (
-                f"useful for finding information about {agent_document.document.name}"
+            description = agent_document.document.description or (
+                f"useful for finding information in specific {agent_document.document.name}"
             )
             args_schema = DocumentInput if self.type == "OPENAI" else None
-            embeddings = OpenAIEmbeddings()
-            docsearch = (
-                VectorStoreBase()
-                .get_database()
-                .from_existing_index(embeddings, agent_document.document.id)
-            )
-            summary_tool = DocSummarizerTool(
-                docsearch=docsearch, llm=self._get_llm(has_streaming=False)
+            docsearch_tool = DocumentTool(document_id=agent_document.document.id)
+            docsearch_tool_all = DocumentTool(
+                document_id=agent_document.document.id, query_type="all"
             )
 
             if agent_document.document.type == "CSV":
@@ -352,17 +350,7 @@ class AgentBase:
                         else agent_document.document.name,
                         description=description,
                         args_schema=args_schema,
-                        func=RetrievalQA.from_chain_type(
-                            llm=self._get_llm(has_streaming=False),
-                            retriever=docsearch.as_retriever(),
-                        ),
-                    )
-                )
-                tools.append(
-                    Tool.from_function(
-                        func=summary_tool.run,
-                        name="document-summarizer",
-                        description="useful for summarizing a whole document",
+                        func=docsearch_tool.run,
                     )
                 )
 
