@@ -119,6 +119,16 @@ export const options = {
 
       },
     },
+    csrfToken: {
+      name: '__Host-next-auth.csrf-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: true, // Ensure this is set when sameSite is 'none'
+    // Optionally, if you have a specific domain
+      }
+    },
     // Add any other cookies here if needed
   },
   pages: {
