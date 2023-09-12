@@ -36,10 +36,9 @@ export default function Login() {
 
         const { email, password } = event.data;
 
-        emailInput.value = email;
-        passwordInput.value = password;
+        const mydata={ email, password }
 
-        loginForm.submit();
+        onSubmit(mydata)
       }
     };
 
