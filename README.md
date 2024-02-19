@@ -2,7 +2,7 @@
 
 # Superagent 🥷
 
-**Build, deploy, and manage LLM-powered agents**
+**Build, deploy, and manage LLM-powered agents**red
 [Superagent.sh](https://Superagent.sh)
 
 <p>
